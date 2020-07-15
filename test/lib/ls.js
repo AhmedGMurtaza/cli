@@ -93,7 +93,7 @@ const ls = requireInject('../../lib/ls.js', {
     limit: {
       fetch: 3
     },
-    get dir () { return prefix + '/node_modules/' },
+    get prefix () { return prefix },
     globalDir: '/foo',
     config: {
       get (key) {
@@ -105,7 +105,7 @@ const ls = requireInject('../../lib/ls.js', {
 })
 
 const redactCwd = res =>
-    res.replace(/\\/g, '/').replace(new RegExp(__dirname.replace(/\\/g, '/'), 'gi'), '{CWD}')
+  res && res.replace(/\\/g, '/').replace(new RegExp(__dirname.replace(/\\/g, '/'), 'gi'), '{CWD}')
 
 const jsonParse = res =>
   JSON.parse(redactCwd(res))
@@ -136,9 +136,15 @@ test('ls', (t) => {
     prefix = t.testdir({
       ...simpleNmFixture
     })
-    ls([], (err) => {
-      t.ifError(err, 'npm ls')
-      t.matchSnapshot(redactCwd(result), 'should output json missing name/version of top-level package')
+    ls([], () => {
+      // XXX: snapshot once wrapped up
+      /*
+      t.matchSnapshot(
+        redactCwd(err),
+        'should log all extraneous deps on error msg'
+      )
+      */
+      t.matchSnapshot(redactCwd(result), 'should output tree missing name/version of top-level package')
       t.end()
     })
   })
@@ -155,8 +161,9 @@ test('ls', (t) => {
       ...simpleNmFixture
     })
     ls([], (err) => {
+      t.equal(err.code, 'EBADLS', 'should have error code')
       t.equal(
-        redactCwd(err),
+        redactCwd(err.message),
         'extraneous: lorem@1.0.0 {CWD}/ls-ls-extraneous-deps/node_modules/lorem',
         'should log extraneous dep as error'
       )
@@ -591,7 +598,8 @@ test('ls', (t) => {
         }
       }
     })
-    ls([], () => {
+    ls([], (err) => {
+      t.ifError(err, 'npm ls')
       t.matchSnapshot(redactCwd(result), 'should print tree output containing deduped ref')
       t.end()
     })

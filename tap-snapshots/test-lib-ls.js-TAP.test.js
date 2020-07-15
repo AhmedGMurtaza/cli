@@ -293,11 +293,12 @@ exports[`test/lib/ls.js TAP ls json read problems > should print empty result 1`
 
 `
 
-exports[`test/lib/ls.js TAP ls missing package.json > should output json missing name/version of top-level package 1`] = `
+exports[`test/lib/ls.js TAP ls missing package.json > should output tree missing name/version of top-level package 1`] = `
 {CWD}/ls-ls-missing-package-json
-+-- foo@1.0.0
-| \`-- bar@1.0.0
-\`-- lorem@1.0.0
++-- bar@1.0.0 extraneous
++-- foo@1.0.0 extraneous
+| \`-- bar@1.0.0 deduped
+\`-- lorem@1.0.0 extraneous
 
 `
 
@@ -359,7 +360,7 @@ test-npm-ls@1.0.0 {CWD}/ls-ls-using-aliases
 
 exports[`test/lib/ls.js TAP ls with filter arg > should output tree contaning only occurences of filtered by package 1`] = `
 test-npm-ls@1.0.0 {CWD}/ls-ls-with-filter-arg
-\`-- lorem@1.0.0 
+\`-- lorem@1.0.0
 
 `
 
